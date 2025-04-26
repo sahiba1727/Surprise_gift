@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Surprise!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .balloon {
+            position: absolute;
+            width: 40px;
+            height: 50px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        
+        .balloon:before {
+            content: "";
+            position: absolute;
+            width: 1px;
+            height: 15px;
+            background: #333;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .game-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px dashed #ff6b6b;
+        }
+        
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .number-cell {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .number-cell:hover {
+            background: #dee2e6;
+        }
+        
+        .number-cell.selected {
+            background: #ff6b6b;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        button:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+        
+        .secret-message {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            animation: fadeIn 1s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: confettiFall 5s linear forwards;
+        }
+        
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .birthday-cake {
+            font-size: 50px;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="balloon" style="top: 20px; left: 30px;"></div>
+        <div class="balloon" style="top: 40px; right: 40px; background: #74b9ff;"></div>
+        <div class="balloon" style="top: 70px; left: 60px; background: #55efc4;"></div>
+        
+        <h1>🎉 Happy Birthday! 🎉</h1>
+        <p>Dear <span id="name">Birthday Girl</span>,</p>
+        <p>Welcome to your special day! Let's play a little game to unlock your birthday surprise!</p>
+        
+        <div class="game-container">
+            <p>Can you select all numbers that add up to your age? (<span id="age">25</span>)</p>
+            <p>You need to select exactly 3 numbers!</p>
+            
+            <div class="number-grid" id="numberGrid">
+                <!-- Numbers will be generated by JavaScript -->
+            </div>
+            
+            <button id="checkButton">Check My Answer</button>
+            <p id="hint" style="color: #ff6b6b; margin-top: 10px; font-size: 14px;"></p>
+        </div>
+        
+        <div class="secret-message" id="secretMessage">
+            <div class="birthday-cake">🎂</div>
+            <h2>Your Special Message!</h2>
+            <p>Congratulations on cracking the code! Here's your secret message:</p>
+            <p id="messageContent" style="font-style: italic; margin: 15px 0; padding: 15px; background: white; border-radius: 10px; border-left: 5px solid #ff6b6b;">
+                You are an amazing person who brings light to everyone around you. On your special day, I hope all your dreams come true and this year brings you endless joy and success. Happy Birthday!
+            </p>
+            <p>With love,</p>
+            <p><strong>Your Secret Admirer</strong></p>
+        </div>
+    </div>
+
+    <script>
+        // Customize these values
+        const birthdayGirlName = "Mela Bacchaa😘";
+        const birthdayGirlAge = 25;
+        const secretMessage = "Meri yea choti si koshish thi kch new bnane ki jisse tmhari khushi bht bht badh jae...Bht Important birthday hai yea tumhara..Meri Moti aaj 25 saal ki hogyi...Buddhi ho gyi😂😂😂...Mashallah..Allah meri jaan ko humesha khush rakhe, aur meri hi paglii bana kr rkhe aur kya kahun itna sab kch toh pehli keh chuka hun..Aaj k din gussa v mat karna...Aaj k din agr Gussa krogi to or Moti ho jaogi😍I LOVE YOU❤️I LOVE YOU TO THE SQUARE OF THE INFINITY❤️I LOVE YOU MELAAA BACHHAAAA,,,MERI MOTIII😂😂,,,MELI JAAN..Aur han,,Aaj k din aankhon me aansu nhi aani chahiye...Many Many Silver Jublee of the day💕😘";
+        
+        // Set the name and age
+        document.getElementById('name').textContent = birthdayGirlName;
+        document.getElementById('age').textContent = birthdayGirlAge;
+        document.getElementById('messageContent').textContent = secretMessage;
+        
+        // Generate numbers for the game
+        const numberGrid = document.getElementById('numberGrid');
+        const numbers = [];
+        const selectedNumbers = [];
+        
+        // Generate random numbers (some that add up to the age and some random ones)
+        const solution1 = Math.floor(Math.random() * (birthdayGirlAge - 10)) + 5;
+        const solution2 = Math.floor(Math.random() * (birthdayGirlAge - solution1 - 5)) + 5;
+        const solution3 = birthdayGirlAge - solution1 - solution2;
+        
+        numbers.push(solution1, solution2, solution3);
+        
+        // Add some random numbers
+        while (numbers.length < 15) {
+            const randomNum = Math.floor(Math.random() * 30) + 1;
+            if (!numbers.includes(randomNum) && randomNum !== birthdayGirlAge) {
+                numbers.push(randomNum);
+            }
+        }
+        
+        // Shuffle the numbers
+        for (let i = numbers.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+        }
+        
+        // Create number cells
+        numbers.forEach(num => {
+            const cell = document.createElement('div');
+            cell.className = 'number-cell';
+            cell.textContent = num;
+            cell.addEventListener('click', () => {
+                cell.classList.toggle('selected');
+                const numValue = parseInt(cell.textContent);
+                
+                if (selectedNumbers.includes(numValue)) {
+                    selectedNumbers.splice(selectedNumbers.indexOf(numValue), 1);
+                } else {
+                    if (selectedNumbers.length < 3) {
+                        selectedNumbers.push(numValue);
+                    } else {
+                        cell.classList.remove('selected');
+                    }
+                }
+            });
+            numberGrid.appendChild(cell);
+        });
+        
+        // Check the answer
+        document.getElementById('checkButton').addEventListener('click', () => {
+            const hintElement = document.getElementById('hint');
+            
+            if (selectedNumbers.length !== 3) {
+                hintElement.textContent = "Please select exactly 3 numbers!";
+                return;
+            }
+            
+            const sum = selectedNumbers.reduce((a, b) => a + b, 0);
+            
+            if (sum === birthdayGirlAge) {
+                // Correct answer
+                hintElement.textContent = "Correct! 🎉 Unlocking your surprise...";
+                hintElement.style.color = "#2ecc71";
+                
+                // Create confetti
+                createConfetti();
+                
+                // Show secret message after a delay
+                setTimeout(() => {
+                    document.getElementById('secretMessage').style.display = 'block';
+                    document.getElementById('game-container').style.display = 'none';
+                }, 1500);
+            } else {
+                // Wrong answer
+                hintElement.textContent = `Not quite! ${selectedNumbers.join(' + ')} = ${sum}. Try again!`;
+                hintElement.style.color = "#ff6b6b";
+                
+                // Deselect all
+                document.querySelectorAll('.number-cell.selected').forEach(cell => {
+                    cell.classList.remove('selected');
+                });
+                selectedNumbers.length = 0;
+            }
+        });
+        
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                
+                document.querySelector('.container').appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
